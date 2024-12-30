@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mr's</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #8e44ad, #3498db);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .container {
+      text-align: center;
+      width: 80%;
+      max-width: 500px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .container h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .container input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .container button {
+      background: #f39c12;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .container button:hover {
+      background: #e67e22;
+    }
+
+    .message {
+      font-size: 24px;
+      margin: 20px 0;
+      animation: fadeIn 1s ease-in-out;
+      display: none;
+    }
+
+    .reply-box {
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: #27ae60;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transition: all 0.5s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="mainContainer">
+    <h1 id="header">Send an Anonymous Message</h1>
+    <div id="inputSection">
+      <input type="text" id="messageInput" placeholder="Type your message here..." />
+      <button id="getLink">Get Link</button>
+    </div>
+    <div class="message" id="displayMessage"></div>
+    <button id="replyButton" style="display: none;">Reply</button>
+    <div class="reply-box" id="replyBox">
+      <input type="text" id="replyInput" placeholder="Type your reply here..." />
+      <button id="sendReply">Get Link</button>
+    </div>
+  </div>
+  <div class="toast" id="toast">Link copied to clipboard!</div>
+  <script>
+    const header = document.getElementById("header");
+    const inputSection = document.getElementById("inputSection");
+    const messageInput = document.getElementById("messageInput");
+    const getLinkButton = document.getElementById("getLink");
+    const displayMessage = document.getElementById("displayMessage");
+    const replyButton = document.getElementById("replyButton");
+    const replyBox = document.getElementById("replyBox");
+    const replyInput = document.getElementById("replyInput");
+    const sendReplyButton = document.getElementById("sendReply");
+    const toast = document.getElementById("toast");
+    const urlParams = new URLSearchParams(window.location.search);
+    const message = urlParams.get("message");
+
+    if (message) {
+      inputSection.style.display = "none";
+      header.style.display = "none";
+      displayMessage.textContent = decodeURIComponent(message);
+      displayMessage.style.display = "block";
+      replyButton.style.display = "block";
+    }
+    getLinkButton.addEventListener("click", () => {
+      const userMessage = messageInput.value.trim();
+
+      if (userMessage === "") {
+        alert("Please enter a message.");
+        return;
+      }
+
+      const encodedMessage = encodeURIComponent(userMessage);
+      const link = `${window.location.origin}${window.location.pathname}?message=${encodedMessage}`;
+      navigator.clipboard.writeText(link).then(() => {
+        showToast();
+      });
+    });
+
+    replyButton.addEventListener("click", () => {
+      displayMessage.style.display = "none";
+      replyButton.style.display = "none";
+      replyBox.style.display = "block";
+    });
+
+    sendReplyButton.addEventListener("click", () => {
+      const replyMessage = replyInput.value.trim();
+
+      if (replyMessage === "") {
+        alert("Please enter a reply message.");
+        return;
+      }
+
+      const encodedReply = encodeURIComponent(replyMessage);
+      const replyLink = `${window.location.origin}${window.location.pathname}?message=${encodedReply}`;
+
+      navigator.clipboard.writeText(replyLink).then(() => {
+        showToast();
+      });
+    });
+
+    function showToast() {
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
